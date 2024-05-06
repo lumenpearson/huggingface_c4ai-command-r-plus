@@ -5,8 +5,6 @@ import re
 import uuid
 import secrets
 
-
-
 cohere_api_key = os.getenv("COHERE_API_KEY")
 co = cohere.Client(cohere_api_key, client_name="huggingface-rp")
 
@@ -14,12 +12,11 @@ co = cohere.Client(cohere_api_key, client_name="huggingface-rp")
 def trigger_example(example):
     chat, updated_history = generate_response(example)
     return chat, updated_history
-        
-def generate_response(user_message, cid, token, history=None):
 
+
+def generate_response(user_message, cid, token, history=None):
     if not token:
         raise gr.Error("Error loading.")
-        
     if history is None:
         history = []
     if cid == "" or None:    
@@ -28,9 +25,7 @@ def generate_response(user_message, cid, token, history=None):
     print(f"cid: {cid} prompt:{user_message}")
     
     history.append(user_message)
-    
     stream = co.chat_stream(message=user_message, conversation_id=cid, model='command-r-plus', connectors=[], temperature=0.3)
-    
     output = ""
     
     for idx, response in enumerate(stream):
@@ -45,7 +40,6 @@ def generate_response(user_message, cid, token, history=None):
             for i in range(0, len(history) - 1, 2)
         ] 
         yield chat, history, cid
-        
     return chat, history, cid
     
 
@@ -97,16 +91,12 @@ with gr.Blocks(analytics_enabled=False, css=custom_css) as demo:
             <br/>
             **License**: [CC-BY-NC](https://cohere.com/c4ai-cc-by-nc-license), requires also adhering to [C4AI's Acceptable Use Policy](https://docs.cohere.com/docs/c4ai-acceptable-use-policy)
             """
-            )
-            
+            ) 
     with gr.Column():
         with gr.Row():
             chatbot = gr.Chatbot(show_label=False, show_share_button=False, show_copy_button=True)
-        
         with gr.Row():
             user_message = gr.Textbox(lines=1, placeholder="Ask anything ...", label="Input", show_label=False)
-
-      
         with gr.Row():
             submit_button = gr.Button("Submit")
             clear_button = gr.Button("Clear chat")
@@ -132,7 +122,7 @@ with gr.Blocks(analytics_enabled=False, css=custom_css) as demo:
                 outputs=[chatbot],
                 examples_per_page=100
             )
-
+            
     demo.load(lambda: secrets.token_hex(16), None, token)
 
 if __name__ == "__main__":
